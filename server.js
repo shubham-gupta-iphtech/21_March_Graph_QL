@@ -17,6 +17,9 @@ const User = mongoose.model("User", new mongoose.Schema({
     },
     email: {
         type: String
+    }, 
+    password: {
+        type: String
     }
 
 }))
@@ -28,19 +31,32 @@ type User
   email: String! 
 }
 
+type AuthPayload
+{ 
+ token: String!
+ user: User!
+}
+
 type Query 
 {  getUsers : [User]
+   me: User
 }
 
 type Mutation
 {
- createUser(name: String!, email: String!): User 
+  register(name: String!, email: String!, password: String!): AuthPayload 
+  login(email: String!, password: String!): AuthPayload
 }
 `;
+
+//importing few packages 
+import bcrypt from "bcryptjs";
+import jwt from "jsonwebtoken";
 
 const resolvers = { 
     Query : { 
         getUsers: async () => await User.find(),
+        me: async(_)
     }, 
     Mutation : {
         createUser : async (_, {name, email}) => 
